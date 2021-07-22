@@ -40,16 +40,23 @@ export function createDebugAsyncNode(
       createDebuggerAPI(bindings, apiNamespace, logger)
     );
     const repl = startRepl(replOptions);
-    repl.once('exit', api.resumeExecution);
+    const exitPromise = new Promise<void>((resolve) => {
+      repl.once('exit', () => {
+        api.resumeExecution();
+        resolve();
+      });
+    });
     const teardown = applyToContexts([...contexts, repl.context]);
 
     try {
       isBeingDebugged = true;
-      return await resultPromise;
+      const result = await resultPromise;
+      return result;
     } finally {
-      isBeingDebugged = false;
-      repl.close();
       teardown();
+      repl.close();
+      await exitPromise;
+      isBeingDebugged = false;
     }
   };
 }
