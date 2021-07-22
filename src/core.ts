@@ -1,3 +1,3 @@
-export * from './debug-in-contexts';
+export * from './create-debugger-api';
 export * from './extend-context';
 export * from './types';

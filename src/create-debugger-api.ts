@@ -1,8 +1,7 @@
 import type {Bindings, Logger} from './types';
 import {extendContext} from './extend-context';
 
-export function debugInContexts(
-  contexts: object[],
+export function createDebuggerAPI(
   bindings: Bindings,
   apiNamespace: string,
   logger: Logger
@@ -33,19 +32,21 @@ export function debugInContexts(
     extensionMap.set(key, getValue);
   }
   extensionMap.set(apiNamespace, () => api);
-
-  const contextCleanups = contexts.map((context) => (
-    extendContext(context as Record<string, unknown>, extensionMap, logger)
-  ));
   logger.info(
     `Async function is paused for debugging. The following variables ` +
     `are available: [${[...extensionMap.keys()].sort().join(', ')}].`
   );
-  const teardown = () => {
-    logger.info('Async function execution is resumed.');
-    for (const cleanup of contextCleanups) {
-      cleanup();
-    }
+
+  const applyToContexts = (contexts: object[]) => {
+    const contextCleanups = contexts.map((context) => (
+      extendContext(context as Record<string, unknown>, extensionMap, logger)
+    ));
+    return () => {
+      logger.info('Async function execution is resumed.');
+      for (const cleanup of contextCleanups) {
+        cleanup();
+      }
+    };
   };
-  return {teardown, resultPromise, api};
+  return {applyToContexts, resultPromise, api};
 }

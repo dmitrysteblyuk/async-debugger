@@ -1,4 +1,4 @@
-import {debugInContexts} from './debug-in-contexts';
+import {createDebuggerAPI} from './create-debugger-api';
 import type {Bindings, DebugAsyncCommonOptions, Logger} from './types';
 
 export const debugAsync = createDebugAsyncBrowser();
@@ -31,10 +31,11 @@ export function createDebugAsyncBrowser(
       logger: {info = console.info, warn = console.warn} = defaultLogger
     } = options;
     const logger: Logger = {info, warn};
-
-    const {resultPromise, teardown} = (
-      debugInContexts(contexts, bindings, apiNamespace, logger)
+    const {resultPromise, applyToContexts} = (
+      createDebuggerAPI(bindings, apiNamespace, logger)
     );
+    const teardown = applyToContexts(contexts);
+
     try {
       isBeingDebugged = true;
       return await resultPromise;

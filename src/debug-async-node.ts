@@ -1,5 +1,5 @@
 import {start as startRepl, ReplOptions} from 'repl';
-import {debugInContexts} from './debug-in-contexts';
+import {createDebuggerAPI} from './create-debugger-api';
 import type {Bindings, DebugAsyncCommonOptions, Logger} from './types';
 
 export const debugAsync = createDebugAsyncNode();
@@ -36,12 +36,12 @@ export function createDebugAsyncNode(
       replOptions = replOptionsDefault
     } = options;
     const logger: Logger = {info, warn};
-
-    const repl = startRepl(replOptions);
-    const {resultPromise, teardown, api} = (
-      debugInContexts([...contexts, repl.context], bindings, apiNamespace, logger)
+    const {resultPromise, applyToContexts, api} = (
+      createDebuggerAPI(bindings, apiNamespace, logger)
     );
+    const repl = startRepl(replOptions);
     repl.once('exit', api.resumeExecution);
+    const teardown = applyToContexts([...contexts, repl.context]);
 
     try {
       isBeingDebugged = true;
