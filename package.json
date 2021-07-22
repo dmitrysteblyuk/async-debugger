@@ -27,10 +27,10 @@
     "build:publish": "tsc --project tsconfig.publish.json",
     "build:clean": "rimraf lib",
     "test": "yarn test:duplicate && yarn assert-no-vulnerabilities && yarn test:types",
-    "test:duplicate": "yarn-deduplicate --fail --list -s highest yarn.lock",
+    "test:duplicate": "yarn dedupe --check --strategy highest",
     "test:types": "tsc --noEmit",
-    "assert-no-vulnerabilities": "bash -c 'yarn audit; [[ $? -ge 1 ]] && exit 1 || exit 0' && echo 'No vulnerabilities found.'",
-    "release:prepare": "yarn build:clean && yarn test && yarn build && yarn npm pack --dry-run --json"
+    "assert-no-vulnerabilities": "bash -c 'yarn npm audit; [[ $? -ge 1 ]] && exit 1 || exit 0' && echo 'No vulnerabilities found.'",
+    "release:prepare": "yarn build:clean && yarn test && yarn build && npm pack --dry-run --json"
   },
   "dependencies": {
     "@babel/core": "^7.14.8",
