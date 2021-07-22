@@ -1,0 +1,4 @@
+{
+  "main": "../lib/babel-plugin.js",
+  "types": "../lib/babel-plugin.d.ts"
+}
