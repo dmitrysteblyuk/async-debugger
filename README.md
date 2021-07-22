@@ -85,3 +85,5 @@ node --require async-debugger/register --experimental-repl-await server.js
 ```
 
 Then make a GET request to `http://localhost:3000/users/2` and use the REPL launched automatically in your terminal:
+
+![alt text](assets/repl.png)
