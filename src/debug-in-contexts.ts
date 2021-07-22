@@ -38,8 +38,8 @@ export function debugInContexts(
     extendContext(context as Record<string, unknown>, extensionMap, logger)
   ));
   logger.info(
-    `Async function is paused for debugging. The following variables ' +
-    'are available: [${[...extensionMap.keys()].sort().join(', ')}].`
+    `Async function is paused for debugging. The following variables ` +
+    `are available: [${[...extensionMap.keys()].sort().join(', ')}].`
   );
   const teardown = () => {
     logger.info('Async function execution is resumed.');
