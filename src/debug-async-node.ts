@@ -1,6 +1,7 @@
 import {start as startREPL, ReplOptions} from 'repl';
 import {prepareDebugAsync} from './prepare-debug-async';
 import {API_NAMESPACE, Bindings, DebugAsyncCommonOptions, getLogger} from './core';
+import {extendContext} from './extend-context';
 
 export const debugAsync = createDebugAsyncNode();
 export interface DebugAsyncNodeOptions extends DebugAsyncCommonOptions {
@@ -37,12 +38,17 @@ export function createDebugAsyncNode(
       replOptions = replOptionsDefault
     } = options;
     const logger = getLogger(defaultLogger);
-    const {resultPromise, applyToContext, api, startMessage, stopMessage} = (
-      prepareDebugAsync(bindings, overrideProperties, apiNamespace, logger)
+    const {resultPromise, extension, api, startMessage, stopMessage} = (
+      prepareDebugAsync(bindings, apiNamespace)
     );
     logger.info?.(startMessage);
 
-    const teardowns = contexts.map(applyToContext);
+    const teardowns = contexts.map((context) => extendContext(
+      context as Record<string, () => unknown>,
+      extension,
+      overrideProperties,
+      logger
+    ));
     const repl = startREPL(replOptions);
     const exitPromise = new Promise<void>((resolve) => {
       repl.once('exit', () => {
@@ -50,9 +56,7 @@ export function createDebugAsyncNode(
         resolve();
       });
     });
-    if (!contexts.includes(globalThis)) {
-      applyToContext(repl.context);
-    }
+    extendContext(repl.context, extension, true, {...logger, warn: null});
 
     try {
       isBeingDebugged = true;

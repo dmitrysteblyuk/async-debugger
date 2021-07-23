@@ -1,5 +1,6 @@
 import {prepareDebugAsync} from './prepare-debug-async';
 import {API_NAMESPACE, Bindings, DebugAsyncCommonOptions, getLogger} from './core';
+import {extendContext} from './extend-context';
 
 export const debugAsync = createDebugAsyncBrowser();
 export interface DebugAsyncBrowserOptions extends DebugAsyncCommonOptions {}
@@ -33,11 +34,16 @@ export function createDebugAsyncBrowser(
       logger: defaultLogger = loggerDefault
     } = options;
     const logger = getLogger(defaultLogger);
-    const {resultPromise, applyToContext, startMessage, stopMessage} = (
-      prepareDebugAsync(bindings, overrideProperties, apiNamespace, logger)
+    const {resultPromise, extension, startMessage, stopMessage} = (
+      prepareDebugAsync(bindings, apiNamespace)
     );
     logger.info?.(startMessage);
-    const teardowns = contexts.map(applyToContext);
+    const teardowns = contexts.map((context) => extendContext(
+      context as Record<string, () => unknown>,
+      extension,
+      overrideProperties,
+      logger
+    ));
 
     try {
       isBeingDebugged = true;

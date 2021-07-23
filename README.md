@@ -64,11 +64,11 @@ const getUserById = async (id) => {
 const server = createServer(async (request, response) => {
   try {
     const userId = +request.url.split('/').pop();
-    const user = await getUserById(userId);
+    const {name} = await getUserById(userId);
 
     await 'debugger'; // <-- it will await until REPL is closed.
 
-    response.write(JSON.stringify(user));
+    response.write(name);
   } catch (error) {
     response.statusCode = 500;
     response.write(String(error));
@@ -91,7 +91,7 @@ Then make a GET request to `http://localhost:3000/users/1` and use the REPL laun
 
 ![alt text](assets/repl.png)
 
-Alternatively you can add `--inspect` flag when running node and use AsyncDebugger in a browser console. More in https://nodejs.org/en/docs/guides/debugging-getting-started/
+Alternatively, you can add `--inspect` flag when running node and use AsyncDebugger in a browser console. More in https://nodejs.org/en/docs/guides/debugging-getting-started/
 
 ### In Browser
 
@@ -101,4 +101,7 @@ On `await 'debugger'` statement in the async function it will be paused and you 
 
 Available plugin options:
 
-- `debugAsyncDeclarationHeader` - a string that will be inserted in the beginning of any file that has `await 'debugger'` statements. It should declare `__debugAsync__` function. This step will be skipped if `__debugAsync__` is already declared in the debugged scope. You can also set `debugAsyncDeclarationHeader` to an empty string and define `__debugAsync__` in the global scope manually. Default value is `const {debugAsync: __debugAsync__} = require('async-debugger');`.
+- `debugAsyncDeclarationHeader` - code that will be inserted in the beginning of any file that has `await 'debugger'` statements.
+It will declare `__debugAsync__` function if it is not already declared in the debugged scope.
+You can also set `debugAsyncDeclarationHeader` to an empty string and define `__debugAsync__` in the global scope manually.
+Default value is `const {debugAsync: __debugAsync__} = require('async-debugger');`.

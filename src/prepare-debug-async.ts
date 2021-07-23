@@ -1,12 +1,6 @@
-import type {Bindings, Logger} from './core';
-import {extendContext} from './extend-context';
+import type {Bindings} from './core';
 
-export function prepareDebugAsync(
-  bindings: Bindings,
-  overrideProperties: boolean,
-  apiNamespace: string,
-  logger: Logger
-) {
+export function prepareDebugAsync(bindings: Bindings, apiNamespace: string) {
   let api!: {
     resumeExecution: (value?: unknown) => void;
     failExecution: (reason?: unknown) => void;
@@ -39,11 +33,6 @@ export function prepareDebugAsync(
     `are available: [${[...extension.keys()].sort().join(', ')}].`
   );
   const stopMessage = 'Async function execution is resumed.';
-  const applyToContext = (context: object) => extendContext(
-    context as Record<string, unknown>,
-    extension,
-    overrideProperties,
-    logger
-  );
-  return {applyToContext, resultPromise, api, startMessage, stopMessage};
+
+  return {extension, resultPromise, api, startMessage, stopMessage};
 }
