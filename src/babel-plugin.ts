@@ -4,16 +4,16 @@ import * as types from '@babel/types';
 
 const DEBUGGER_LITERAL = 'debugger';
 const DEBUG_ASYNC_FUNCTION = '__debugAsync__';
-const IMPORT_DEBUG_ASYNC_LINE_DEFAULT = (
+const DEBUG_ASYNC_DECLARATION_DEFAULT = (
   `const {debugAsync: ${DEBUG_ASYNC_FUNCTION}} = require('async-debugger');`
 );
 
 export = (
   _api: {},
   {
-    importDebugAsyncLine = IMPORT_DEBUG_ASYNC_LINE_DEFAULT
+    debugAsyncDeclarationHeader = DEBUG_ASYNC_DECLARATION_DEFAULT
   }: {
-    importDebugAsyncLine?: string;
+    debugAsyncDeclarationHeader?: string;
   } = {}
 ): core.PluginObj => {
   const awaitDebuggerExpressions = new Set<core.NodePath<types.AwaitExpression>>();
@@ -29,24 +29,24 @@ export = (
       }
     },
     post(file) {
-      let requiresPauseToDebug = false;
+      let requiresDebugAsyncDeclaration = false;
       for (const path of awaitDebuggerExpressions) {
         if (handleAwaitDebuggerExpression(path)) {
-          requiresPauseToDebug = true;
+          requiresDebugAsyncDeclaration = true;
         }
       }
-      if (requiresPauseToDebug) {
-        addPauseToDebugRequire(file.path, importDebugAsyncLine);
+      if (requiresDebugAsyncDeclaration) {
+        insertDebugAsyncDeclarationHeader(file.path, debugAsyncDeclarationHeader);
       }
     }
   };
 };
 
-function addPauseToDebugRequire(
+function insertDebugAsyncDeclarationHeader(
   path: core.NodePath<types.Program>,
-  importDebugAsyncLine: string
+  debugAsyncDeclarationHeader: string
 ) {
-  const result = parseSync(importDebugAsyncLine);
+  const result = parseSync(debugAsyncDeclarationHeader);
   if (result === null) {
     return;
   }
@@ -65,7 +65,7 @@ function handleAwaitDebuggerExpression(
     return false;
   });
   const set = new Set(variableNames);
-  const requiresPauseToDebug = !set.has(DEBUG_ASYNC_FUNCTION);
+  const requiresDebugAsyncDeclaration = !set.has(DEBUG_ASYNC_FUNCTION);
   variableNames = [...set];
 
   path.replaceWith(
@@ -83,5 +83,5 @@ function handleAwaitDebuggerExpression(
       path.node
     ])
   );
-  return requiresPauseToDebug;
+  return requiresDebugAsyncDeclaration;
 }

@@ -4,9 +4,11 @@
   "description": "Run async code at breakpoints in Browser and Node.",
   "keywords": [
     "async",
+    "debugger",
     "repl",
-    "debugging",
-    "development"
+    "babel",
+    "plugin",
+    "babel-plugin"
   ],
   "main": "./lib/debug-async-node.js",
   "browser": "./lib/debug-async-browser.js",
@@ -15,7 +17,7 @@
   "repository": "https://github.com/dmitrysteblyuk/async-debugger.git",
   "license": "MIT",
   "files": [
-    "babel",
+    "babel-plugin",
     "browser",
     "core",
     "lib",

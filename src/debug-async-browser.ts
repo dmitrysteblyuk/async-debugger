@@ -1,5 +1,5 @@
-import {createDebuggerAPI} from './create-debugger-api';
-import type {Bindings, DebugAsyncCommonOptions, Logger} from './types';
+import {prepareDebugAsync} from './prepare-debug-async';
+import {API_NAMESPACE, Bindings, DebugAsyncCommonOptions, getLogger} from './core';
 
 export const debugAsync = createDebugAsyncBrowser();
 export interface DebugAsyncBrowserOptions extends DebugAsyncCommonOptions {}
@@ -8,8 +8,9 @@ export function createDebugAsyncBrowser(
   {
     defaults: {
       contexts: contextsDefault = [globalThis],
-      logger: defaultLogger = {},
-      apiNamespace: apiNamespaceDefault = 'AsyncDebugger'
+      overrideProperties: overridePropertiesDefault = true,
+      apiNamespace: apiNamespaceDefault = API_NAMESPACE,
+      logger: loggerDefault
     } = {}
   }: {
     defaults?: DebugAsyncBrowserOptions
@@ -27,21 +28,26 @@ export function createDebugAsyncBrowser(
     }
     const {
       contexts = contextsDefault,
+      overrideProperties = overridePropertiesDefault,
       apiNamespace = apiNamespaceDefault,
-      logger: {info = console.info, warn = console.warn} = defaultLogger
+      logger: defaultLogger = loggerDefault
     } = options;
-    const logger: Logger = {info, warn};
-    const {resultPromise, applyToContexts} = (
-      createDebuggerAPI(bindings, apiNamespace, logger)
+    const logger = getLogger(defaultLogger);
+    const {resultPromise, applyToContext, startMessage, stopMessage} = (
+      prepareDebugAsync(bindings, overrideProperties, apiNamespace, logger)
     );
-    const teardown = applyToContexts(contexts);
+    logger.info?.(startMessage);
+    const teardowns = contexts.map(applyToContext);
 
     try {
       isBeingDebugged = true;
       return await resultPromise;
     } finally {
+      for (const teardown of teardowns) {
+        teardown();
+      }
       isBeingDebugged = false;
-      teardown();
+      logger.info?.(stopMessage);
     }
   };
 }

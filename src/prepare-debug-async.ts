@@ -1,12 +1,12 @@
-import type {Bindings, Logger} from './types';
+import type {Bindings, Logger} from './core';
 import {extendContext} from './extend-context';
 
-export function createDebuggerAPI(
+export function prepareDebugAsync(
   bindings: Bindings,
+  overrideProperties: boolean,
   apiNamespace: string,
   logger: Logger
 ) {
-  const extensionMap = new Map<string, () => unknown>();
   let api!: {
     resumeExecution: (value?: unknown) => void;
     failExecution: (reason?: unknown) => void;
@@ -14,6 +14,7 @@ export function createDebuggerAPI(
   const resultPromise = new Promise((resolve, reject) => {
     api = {resumeExecution: resolve, failExecution: reject};
   });
+  const extension = new Map<string, () => unknown>();
 
   for (const key in bindings) {
     if (!bindings.hasOwnProperty(key)) {
@@ -29,24 +30,20 @@ export function createDebuggerAPI(
       }
       throw error;
     }
-    extensionMap.set(key, getValue);
+    extension.set(key, getValue);
   }
-  extensionMap.set(apiNamespace, () => api);
-  logger.info(
-    `Async function is paused for debugging. The following variables ` +
-    `are available: [${[...extensionMap.keys()].sort().join(', ')}].`
-  );
+  extension.set(apiNamespace, () => api);
 
-  const applyToContexts = (contexts: object[]) => {
-    const contextCleanups = contexts.map((context) => (
-      extendContext(context as Record<string, unknown>, extensionMap, logger)
-    ));
-    return () => {
-      logger.info('Async function execution is resumed.');
-      for (const cleanup of contextCleanups) {
-        cleanup();
-      }
-    };
-  };
-  return {applyToContexts, resultPromise, api};
+  const startMessage = (
+    `Async function is paused for debugging. The following variables ` +
+    `are available: [${[...extension.keys()].sort().join(', ')}].`
+  );
+  const stopMessage = 'Async function execution is resumed.';
+  const applyToContext = (context: object) => extendContext(
+    context as Record<string, unknown>,
+    extension,
+    overrideProperties,
+    logger
+  );
+  return {applyToContext, resultPromise, api, startMessage, stopMessage};
 }

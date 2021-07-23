@@ -1,4 +1,4 @@
 {
-  "main": "../lib/debug-async-node.js",
-  "types": "../lib/debug-async-node.d.ts"
+  "main": "../lib/index.js",
+  "types": "../lib/index.d.ts"
 }

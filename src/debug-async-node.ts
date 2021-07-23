@@ -1,18 +1,18 @@
-import {start as startRepl, ReplOptions} from 'repl';
-import {createDebuggerAPI} from './create-debugger-api';
-import type {Bindings, DebugAsyncCommonOptions, Logger} from './types';
+import {start as startREPL, ReplOptions} from 'repl';
+import {prepareDebugAsync} from './prepare-debug-async';
+import {API_NAMESPACE, Bindings, DebugAsyncCommonOptions, getLogger} from './core';
 
 export const debugAsync = createDebugAsyncNode();
 export interface DebugAsyncNodeOptions extends DebugAsyncCommonOptions {
   replOptions?: ReplOptions;
 }
-
 export function createDebugAsyncNode(
   {
     defaults: {
       contexts: contextsDefault = [globalThis],
-      logger: defaultLogger = {},
-      apiNamespace: apiNamespaceDefault = 'AsyncDebugger',
+      overrideProperties: overridePropertiesDefault = true,
+      apiNamespace: apiNamespaceDefault = API_NAMESPACE,
+      logger: loggerDefault,
       replOptions: replOptionsDefault
     } = {}
   }: {
@@ -31,32 +31,40 @@ export function createDebugAsyncNode(
     }
     const {
       contexts = contextsDefault,
+      overrideProperties = overridePropertiesDefault,
       apiNamespace = apiNamespaceDefault,
-      logger: {info = console.info, warn = console.warn} = defaultLogger,
+      logger: defaultLogger = loggerDefault,
       replOptions = replOptionsDefault
     } = options;
-    const logger: Logger = {info, warn};
-    const {resultPromise, applyToContexts, api} = (
-      createDebuggerAPI(bindings, apiNamespace, logger)
+    const logger = getLogger(defaultLogger);
+    const {resultPromise, applyToContext, api, startMessage, stopMessage} = (
+      prepareDebugAsync(bindings, overrideProperties, apiNamespace, logger)
     );
-    const repl = startRepl(replOptions);
+    logger.info?.(startMessage);
+
+    const teardowns = contexts.map(applyToContext);
+    const repl = startREPL(replOptions);
     const exitPromise = new Promise<void>((resolve) => {
       repl.once('exit', () => {
         api.resumeExecution();
         resolve();
       });
     });
-    const teardown = applyToContexts([...contexts, repl.context]);
+    if (!contexts.includes(globalThis)) {
+      applyToContext(repl.context);
+    }
 
     try {
       isBeingDebugged = true;
-      const result = await resultPromise;
-      return result;
+      return await resultPromise;
     } finally {
-      teardown();
+      for (const teardown of teardowns) {
+        teardown();
+      }
       repl.close();
       await exitPromise;
       isBeingDebugged = false;
+      logger.info?.(stopMessage);
     }
   };
 }

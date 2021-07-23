@@ -1,4 +1,4 @@
 {
-  "main": "../lib/babel-plugin.js",
-  "types": "../lib/babel-plugin.d.ts"
+  "main": "../lib/debug-async-browser.js",
+  "types": "../lib/debug-async-browser.d.ts"
 }
