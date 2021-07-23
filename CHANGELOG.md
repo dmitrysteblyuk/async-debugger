@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/dmitrysteblyuk/async-debugger/compare/v1.0.0...v2.0.0) (2021-07-23)
+
+
+### Features
+
+* add `overrideProperties` option to debugAsync ([4dccaf1](https://github.com/dmitrysteblyuk/async-debugger/commit/4dccaf17f76b8813953b8b40fc3ab65faf72f9ec))
+
+
+### BREAKING CHANGES
+
+* by default variables will override context properties; rename "babel" entry point to "babel-plugin"
+
 # 1.0.0 (2021-07-22)
 
 
