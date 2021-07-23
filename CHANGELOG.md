@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.0...v2.0.1) (2021-07-23)
+
+
+### Bug Fixes
+
+* always override repl context ([e22ac93](https://github.com/dmitrysteblyuk/async-debugger/commit/e22ac9325aa5c9a8ed78dca2e6c17444095dbb1e))
+
 # [2.0.0](https://github.com/dmitrysteblyuk/async-debugger/compare/v1.0.0...v2.0.0) (2021-07-23)
 
 
