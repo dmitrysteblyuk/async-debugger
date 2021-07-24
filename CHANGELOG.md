@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.1...v2.0.2) (2021-07-24)
+
+
+### Bug Fixes
+
+* do not restore context properties if they were changed during debugging ([a949822](https://github.com/dmitrysteblyuk/async-debugger/commit/a9498220edebfd1051fdb5add57fd624fdd0b152))
+
 ## [2.0.1](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.0...v2.0.1) (2021-07-23)
 
 
