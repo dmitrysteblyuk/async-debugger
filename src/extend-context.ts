@@ -1,4 +1,5 @@
 import type {Logger} from './core';
+import {logKeys} from './utils';
 
 export function extendContext(
   context: Record<string, unknown>,
@@ -25,52 +26,60 @@ export function extendContext(
     }
     if (shouldSkip) {
       skippedKeys.push(key);
-    } else {
-      descriptors.set(key, {
-        get,
-        set(value) {
-          delete context[key];
-          context[key] = value;
-        },
-        configurable: true,
-        enumerable: true
-      });
+      continue;
     }
+    descriptors.set(key, {
+      get,
+      set(value) {
+        delete context[key];
+        context[key] = value;
+      },
+      configurable: true,
+      enumerable: true
+    });
+  }
+  for (const [key, descriptor] of descriptors) {
+    Object.defineProperty(context, key, descriptor);
   }
   if (skippedKeys.length > 0) {
     logger.warn?.(
-      `The following properties ${
-        overrideProperties ? 'are not configurable' : 'already exist'
-      } in the context object ` +
-      `and will NOT be overriden: [${skippedKeys.sort().join(', ')}].`
+      'The following context properties ' +
+      (overrideProperties ? 'are not configurable' : 'already exist') +
+      ` and has NOT been overriden: ${logKeys(skippedKeys)}.`
     );
   }
   if (previousDescriptors.size > 0) {
     logger.warn?.(
-      `The following properties will be overriden: ` +
-      `[${[...previousDescriptors.keys()].sort().join(', ')}].`
+      `The following context properties has been overriden: ${
+        logKeys(previousDescriptors.keys())
+      }.`
     );
   }
-  Object.defineProperties(context, Object.fromEntries([...descriptors]));
 
   return () => {
+    const unrestoredKeys: string[] = [];
     for (const [key, {get}] of descriptors) {
-      // Remove property only if it was not changed and did not exist before.
-      if (
-        !previousDescriptors.has(key) &&
-        get === Object.getOwnPropertyDescriptor(context, key)?.get
-      ) {
+      // Restore or delete property only if it was not changed.
+      if (get !== Object.getOwnPropertyDescriptor(context, key)?.get) {
+        if (previousDescriptors.has(key)) {
+          unrestoredKeys.push(key);
+        }
+        continue;
+      }
+      if (previousDescriptors.has(key)) {
+        Object.defineProperty(context, key, previousDescriptors.get(key)!);
+      } else {
         delete context[key];
       }
     }
     descriptors.clear();
-    if (previousDescriptors.size === 0) {
-      return;
-    }
-    Object.defineProperties(
-      context,
-      Object.fromEntries([...previousDescriptors])
-    );
     previousDescriptors.clear();
+
+    if (unrestoredKeys.length > 0) {
+      logger.warn?.(
+        'The following context properties has not been restored because ' +
+        `they were changed during debugging: ${logKeys(unrestoredKeys)}.`
+      );
+    }
   };
 }

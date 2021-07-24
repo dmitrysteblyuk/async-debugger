@@ -43,7 +43,7 @@ export function createDebugAsyncNode(
     );
     logger.info?.(startMessage);
 
-    const teardowns = contexts.map((context) => extendContext(
+    const cleanups = contexts.map((context) => extendContext(
       context as Record<string, () => unknown>,
       extension,
       overrideProperties,
@@ -56,18 +56,18 @@ export function createDebugAsyncNode(
         resolve();
       });
     });
-    extendContext(repl.context, extension, true, {...logger, warn: null});
 
     try {
+      extendContext(repl.context, extension, true, {...logger, warn: null});
       isBeingDebugged = true;
       return await resultPromise;
     } finally {
-      for (const teardown of teardowns) {
-        teardown();
-      }
       repl.close();
       await exitPromise;
       isBeingDebugged = false;
+      for (const cleanup of cleanups) {
+        cleanup();
+      }
       logger.info?.(stopMessage);
     }
   };

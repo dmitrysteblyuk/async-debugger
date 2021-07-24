@@ -5,23 +5,29 @@
 
 Babel plugin and utilities for running async code at breakpoints. Plus REPL console for debugger statements in Node.
 
-## Installation
+## Installation and Usage
 
 ```bash
 yarn add --dev async-debugger
 ```
 
+Transpile your code with `async-debugger/babel-plugin`. See examples on how to do it [below](#examples).
+
+Use `await 'debugger'` statement instead of a regular `debugger` in async functions.
+
+When this statement is reached, the function execution will be paused and you will be able to debug it and run async code in browser console or node REPL.
+
 ## Problem
 
 In JavaScript it is not possible to run async code when execution is paused at a breakpoint (e.g. with `debugger` statement).
 
-Thus it is impossible to test any async logic in browser console when debugging/developing.
+Thus it is impossible to test any async code in browser console when debugging/developing.
 
 ## Solution
 
 AsyncDebugger pauses async functions when they reach the debugger statement and does not block async JS execution.
 
-The access to the variables in the scope is ensured by the **babel plugin** it implements.
+The access to the variables in the scope is ensured by the babel plugin it implements.
 
 For example, the code below:
 

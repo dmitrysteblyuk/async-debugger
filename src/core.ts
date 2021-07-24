@@ -6,7 +6,7 @@ export function getLogger(
     warn = console.warn.bind(console, `[${API_NAMESPACE}]`),
     error = console.error.bind(console, `[${API_NAMESPACE}]`)
   }: Partial<Logger> = {}
-) {
+): Logger {
   return {info, warn, error};
 }
 

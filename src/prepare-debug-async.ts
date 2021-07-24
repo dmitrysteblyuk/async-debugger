@@ -1,4 +1,5 @@
 import type {Bindings} from './core';
+import {logKeys} from './utils';
 
 export function prepareDebugAsync(bindings: Bindings, apiNamespace: string) {
   let api!: {
@@ -29,8 +30,8 @@ export function prepareDebugAsync(bindings: Bindings, apiNamespace: string) {
   extension.set(apiNamespace, () => api);
 
   const startMessage = (
-    `Async function is paused for debugging. The following variables ` +
-    `are available: [${[...extension.keys()].sort().join(', ')}].`
+    'Async function is paused for debugging. The following variables ' +
+    `are available: ${logKeys(extension.keys())}.`
   );
   const stopMessage = 'Async function execution is resumed.';
 
