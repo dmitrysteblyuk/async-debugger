@@ -17,6 +17,8 @@ Use `await 'debugger'` statement instead of a regular `debugger` in async functi
 
 When this statement is reached, the function execution will be paused and you will be able to debug it and run async code in browser console or node REPL.
 
+Example on CodeSandbox - https://codesandbox.io/s/async-debugger-react-webpack-example-7oke6
+
 ## Problem
 
 In JavaScript it is not possible to run async code when execution is paused at a breakpoint (e.g. with `debugger` statement).
@@ -111,3 +113,5 @@ Available plugin options:
 It will declare `__debugAsync__` function if it is not already declared in the debugged scope.
 You can also set `debugAsyncDeclarationHeader` to an empty string and define `__debugAsync__` in the global scope manually.
 Default value is `const {debugAsync: __debugAsync__} = require('async-debugger');`.
+
+See an example for React and Webpack [above](#installation-and-usage).
