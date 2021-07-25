@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.2...v2.0.3) (2021-07-25)
+
+
+### Bug Fixes
+
+* remove @babel/traverse from dependencies ([4d23f4c](https://github.com/dmitrysteblyuk/async-debugger/commit/4d23f4cdb1ab8e6fbb37e33fb81114a8b0daaf73))
+
 ## [2.0.2](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.1...v2.0.2) (2021-07-24)
 
 
