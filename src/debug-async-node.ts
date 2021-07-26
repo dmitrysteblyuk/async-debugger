@@ -34,10 +34,10 @@ export function createDebugAsyncNode(
       contexts = contextsDefault,
       overrideProperties = overridePropertiesDefault,
       apiNamespace = apiNamespaceDefault,
-      logger: defaultLogger = loggerDefault,
+      logger: loggerOptions = loggerDefault,
       replOptions = replOptionsDefault
     } = options;
-    const logger = getLogger(defaultLogger);
+    const logger = getLogger(loggerOptions);
     const {resultPromise, extension, api, startMessage, stopMessage} = (
       prepareDebugAsync(bindings, apiNamespace)
     );

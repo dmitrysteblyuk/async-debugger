@@ -31,9 +31,9 @@ export function createDebugAsyncBrowser(
       contexts = contextsDefault,
       overrideProperties = overridePropertiesDefault,
       apiNamespace = apiNamespaceDefault,
-      logger: defaultLogger = loggerDefault
+      logger: loggerOptions = loggerDefault
     } = options;
-    const logger = getLogger(defaultLogger);
+    const logger = getLogger(loggerOptions);
     const {resultPromise, extension, startMessage, stopMessage} = (
       prepareDebugAsync(bindings, apiNamespace)
     );

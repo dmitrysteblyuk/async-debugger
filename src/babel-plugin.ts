@@ -57,22 +57,21 @@ function insertDebugAsyncDeclarationHeader(
 function handleAwaitDebuggerExpression(
   path: core.NodePath<types.AwaitExpression>
 ) {
-  let variableNames: string[] = [];
+  const variableScopes: string[][] = [];
   path.find((parent) => {
     if (parent.isScopable()) {
-      variableNames = [...variableNames, ...Object.keys(parent.scope.bindings)];
+      variableScopes.push(Object.keys(parent.scope.bindings));
     }
     return false;
   });
-  const set = new Set(variableNames);
-  const requiresDebugAsyncDeclaration = !set.has(DEBUG_ASYNC_FUNCTION);
-  variableNames = [...set];
+  const allVariables = new Set(variableScopes.flat());
+  const requiresDebugAsyncDeclaration = !allVariables.has(DEBUG_ASYNC_FUNCTION);
 
   path.replaceWith(
     types.sequenceExpression([
       types.awaitExpression(
         types.callExpression(types.identifier(DEBUG_ASYNC_FUNCTION), [
-          types.objectExpression(variableNames.map((name) => (
+          types.objectExpression([...allVariables].map((name) => (
             types.objectProperty(
               types.identifier(name),
               types.arrowFunctionExpression([], types.identifier(name))
