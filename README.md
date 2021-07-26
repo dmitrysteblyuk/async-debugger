@@ -34,19 +34,19 @@ The access to the variables in the scope is ensured by the babel plugin it imple
 For example, the code below:
 
 ```javascript
-const a = 'abc';
+const a = "abc";
 let b = 123;
-await 'debugger';
+await "debugger";
 ```
 
 will transpile to (n.b. the actual implementation is different):
 
 ```javascript
-import {debugAsync} from 'async-debugger';
+import { debugAsync } from "async-debugger";
 
-const a = 'abc';
+const a = "abc";
 let b = 123;
-await debugAsync({a, b});
+await debugAsync({ a, b });
 ```
 
 `debugAsync` in its turn will expose the variables to the global object and REPL console in Node.
@@ -58,11 +58,15 @@ await debugAsync({a, b});
 Create a file `server.js` as follows:
 
 ```javascript
-const {createServer} = require('http');
+const { createServer } = require("http");
 
 const getAllUsers = async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  return [{id: 0, name: 'Alpha'}, {id: 1, name: 'Bravo'}, {id: 2, name: 'Charlie'}];
+  return [
+    { id: 0, name: "Alpha" },
+    { id: 1, name: "Bravo" },
+    { id: 2, name: "Charlie" },
+  ];
 };
 const getUserById = async (id) => {
   const allUsers = await getAllUsers();
@@ -71,10 +75,10 @@ const getUserById = async (id) => {
 
 const server = createServer(async (request, response) => {
   try {
-    const userId = +request.url.split('/').pop();
-    const {name} = await getUserById(userId);
+    const userId = +request.url.split("/").pop();
+    const { name } = await getUserById(userId);
 
-    await 'debugger'; // <-- it will await until REPL is closed.
+    await "debugger"; // <-- it will await until REPL is closed.
 
     response.write(name);
   } catch (error) {
@@ -84,7 +88,7 @@ const server = createServer(async (request, response) => {
     response.end();
   }
 });
-server.listen(3000, () => console.log('Listening on', server.address()));
+server.listen(3000, () => console.log("Listening on", server.address()));
 ```
 
 To enable AsyncDebugger you can run it like this:
@@ -110,8 +114,8 @@ On `await 'debugger'` statement in the async function it will be paused and you 
 Available plugin options:
 
 - `debugAsyncDeclarationHeader` - code that will be inserted in the beginning of any file that has `await 'debugger'` statements.
-It will declare `__debugAsync__` function if it is not already declared in the debugged scope.
-You can also set `debugAsyncDeclarationHeader` to an empty string and define `__debugAsync__` in the global scope manually.
-Default value is `const {debugAsync: __debugAsync__} = require('async-debugger');`.
+  It will declare `__debugAsync__` function if it is not already declared in the debugged scope.
+  You can also set `debugAsyncDeclarationHeader` to an empty string and define `__debugAsync__` in the global scope manually.
+  Default value is `const {debugAsync: __debugAsync__} = require('async-debugger');`.
 
 See an example for React and Webpack [above](#installation-and-usage).

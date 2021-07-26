@@ -1,31 +1,31 @@
 import {start as startREPL, ReplOptions} from 'repl';
 import {prepareDebugAsync} from './prepare-debug-async';
-import {API_NAMESPACE, Bindings, DebugAsyncCommonOptions, getLogger} from './core';
+import {
+  API_NAMESPACE,
+  Bindings,
+  DebugAsyncCommonOptions,
+  getLogger,
+} from './core';
 import {extendContext} from './extend-context';
 
 export const debugAsync = createDebugAsyncNode();
 export interface DebugAsyncNodeOptions extends DebugAsyncCommonOptions {
   replOptions?: ReplOptions;
 }
-export function createDebugAsyncNode(
-  {
-    defaults: {
-      contexts: contextsDefault = [globalThis],
-      overrideProperties: overridePropertiesDefault = true,
-      apiNamespace: apiNamespaceDefault = API_NAMESPACE,
-      logger: loggerDefault,
-      replOptions: replOptionsDefault
-    } = {}
-  }: {
-    defaults?: DebugAsyncNodeOptions
-  } = {}
-) {
+export function createDebugAsyncNode({
+  defaults: {
+    contexts: contextsDefault = [globalThis],
+    overrideProperties: overridePropertiesDefault = true,
+    apiNamespace: apiNamespaceDefault = API_NAMESPACE,
+    logger: loggerDefault,
+    replOptions: replOptionsDefault,
+  } = {},
+}: {
+  defaults?: DebugAsyncNodeOptions;
+} = {}) {
   let isBeingDebugged = false;
 
-  return async (
-    bindings: Bindings,
-    options: DebugAsyncNodeOptions = {}
-  ) => {
+  return async (bindings: Bindings, options: DebugAsyncNodeOptions = {}) => {
     if (isBeingDebugged) {
       // Better to just ignore.
       return;
@@ -34,21 +34,22 @@ export function createDebugAsyncNode(
       contexts = contextsDefault,
       overrideProperties = overridePropertiesDefault,
       apiNamespace = apiNamespaceDefault,
-      logger: defaultLogger = loggerDefault,
-      replOptions = replOptionsDefault
+      logger: loggerOptions = loggerDefault,
+      replOptions = replOptionsDefault,
     } = options;
-    const logger = getLogger(defaultLogger);
-    const {resultPromise, extension, api, startMessage, stopMessage} = (
-      prepareDebugAsync(bindings, apiNamespace)
-    );
+    const logger = getLogger(loggerOptions);
+    const {resultPromise, extension, api, startMessage, stopMessage} =
+      prepareDebugAsync(bindings, apiNamespace);
     logger.info?.(startMessage);
 
-    const cleanups = contexts.map((context) => extendContext(
-      context as Record<string, () => unknown>,
-      extension,
-      overrideProperties,
-      logger
-    ));
+    const cleanups = contexts.map((context) =>
+      extendContext(
+        context as Record<string, () => unknown>,
+        extension,
+        overrideProperties,
+        logger,
+      ),
+    );
     const repl = startREPL(replOptions);
     const exitPromise = new Promise<void>((resolve) => {
       repl.once('exit', () => {

@@ -5,18 +5,16 @@ export function extendContext(
   context: Record<string, unknown>,
   extension: Map<string, () => unknown>,
   overrideProperties: boolean,
-  logger: Logger
+  logger: Logger,
 ) {
   const descriptors = new Map<string, PropertyDescriptor>();
   const skippedKeys: string[] = [];
   const previousDescriptors = new Map<string, PropertyDescriptor>();
 
   for (const [key, get] of extension) {
-    let shouldSkip = (
-      overrideProperties
-        ? context.hasOwnProperty(key)
-        : key in context
-    );
+    let shouldSkip = overrideProperties
+      ? context.hasOwnProperty(key)
+      : key in context;
     if (shouldSkip && overrideProperties) {
       const descriptor = Object.getOwnPropertyDescriptor(context, key);
       if (descriptor?.configurable) {
@@ -35,7 +33,7 @@ export function extendContext(
         context[key] = value;
       },
       configurable: true,
-      enumerable: true
+      enumerable: true,
     });
   }
   for (const [key, descriptor] of descriptors) {
@@ -44,15 +42,15 @@ export function extendContext(
   if (skippedKeys.length > 0) {
     logger.warn?.(
       'The following context properties ' +
-      (overrideProperties ? 'are not configurable' : 'already exist') +
-      ` and has NOT been overriden: ${logKeys(skippedKeys)}.`
+        (overrideProperties ? 'are not configurable' : 'already exist') +
+        ` and has NOT been overriden: ${logKeys(skippedKeys)}.`,
     );
   }
   if (previousDescriptors.size > 0) {
     logger.warn?.(
-      `The following context properties has been overriden: ${
-        logKeys(previousDescriptors.keys())
-      }.`
+      `The following context properties has been overriden: ${logKeys(
+        previousDescriptors.keys(),
+      )}.`,
     );
   }
 
@@ -78,7 +76,7 @@ export function extendContext(
     if (unrestoredKeys.length > 0) {
       logger.warn?.(
         'The following context properties has not been restored because ' +
-        `they were changed during debugging: ${logKeys(unrestoredKeys)}.`
+          `they were changed during debugging: ${logKeys(unrestoredKeys)}.`,
       );
     }
   };

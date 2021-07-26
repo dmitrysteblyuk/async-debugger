@@ -1,12 +1,10 @@
 export const API_NAMESPACE = 'AsyncDebugger';
 
-export function getLogger(
-  {
-    info = console.info.bind(console, `[${API_NAMESPACE}]`),
-    warn = console.warn.bind(console, `[${API_NAMESPACE}]`),
-    error = console.error.bind(console, `[${API_NAMESPACE}]`)
-  }: Partial<Logger> = {}
-): Logger {
+export function getLogger({
+  info = console.info.bind(console, `[${API_NAMESPACE}]`),
+  warn = console.warn.bind(console, `[${API_NAMESPACE}]`),
+  error = console.error.bind(console, `[${API_NAMESPACE}]`),
+}: Partial<Logger> = {}): Logger {
   return {info, warn, error};
 }
 

@@ -29,10 +29,9 @@ export function prepareDebugAsync(bindings: Bindings, apiNamespace: string) {
   }
   extension.set(apiNamespace, () => api);
 
-  const startMessage = (
+  const startMessage =
     'Async function is paused for debugging. The following variables ' +
-    `are available: ${logKeys(extension.keys())}.`
-  );
+    `are available: ${logKeys(extension.keys())}.`;
   const stopMessage = 'Async function execution is resumed.';
 
   return {extension, resultPromise, api, startMessage, stopMessage};
