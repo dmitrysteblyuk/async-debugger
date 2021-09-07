@@ -28,9 +28,9 @@
   "scripts": {
     "prepare": "yarn add-pre-commit-hook",
     "add-pre-commit-hook": "node -e \"fs.writeFileSync('.git/hooks/pre-commit', ['#!/bin/sh', 'yarn lint-staged', ''].join('\\\\n'), {mode: fs.constants.S_IRWXU})\"",
-    "build": "yarn build:clean && yarn build:cjs",
+    "build": "yarn build:clean && yarn build:lib",
     "build:clean": "rimraf lib",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:lib": "tsc --project tsconfig.lib.json",
     "test": "yarn test:dedupe && yarn test:audit && yarn test:prettier && yarn test:types && yarn test:unit",
     "test:dedupe": "yarn dedupe --check",
     "test:audit": "bash -c \"yarn npm audit; [[ $? -ge 1 ]] && exit 1 || exit 0\"",
