@@ -1,3 +1,10 @@
+## [2.0.4-beta.1](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.3...v2.0.4-beta.1) (2021-09-07)
+
+
+### Bug Fixes
+
+* fix issue with babel cache ([ecc5d0e](https://github.com/dmitrysteblyuk/async-debugger/commit/ecc5d0e395e3bc1e235f74468aa84c17a60e6856))
+
 ## [2.0.3](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.2...v2.0.3) (2021-07-25)
 
 
