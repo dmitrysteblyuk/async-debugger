@@ -1,3 +1,10 @@
+## [2.0.4-beta.2](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.4-beta.1...v2.0.4-beta.2) (2021-09-07)
+
+
+### Bug Fixes
+
+* fix entry points ([9308704](https://github.com/dmitrysteblyuk/async-debugger/commit/9308704961d505a26e397f48b97f2bab073f2959))
+
 ## [2.0.4-beta.1](https://github.com/dmitrysteblyuk/async-debugger/compare/v2.0.3...v2.0.4-beta.1) (2021-09-07)
 
 
